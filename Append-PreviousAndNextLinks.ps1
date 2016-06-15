@@ -169,13 +169,18 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                         
                         write-debug "`$tagstring: <$tagstring>"
                     
+                        $Element = -1
                         $tags = foreach ($Tag in $TagArray)
                         {
+                            $Element++
                             $Tag = $Tag.trim()
                             $Tag = $Tag.trim('"')
                             write-debug "`$tag: <$tag>"
-                            [PSCustomObject]@{Tag = $Tag}
+                            $TagArray[$Element] = $Tag
+
                         }
+#>
+                        $Tags = $TagArray
                     }
                     # aliases CAN be multiple, but I've not coded for this yet
                     "aliases"

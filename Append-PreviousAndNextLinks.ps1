@@ -163,11 +163,18 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                     {
                         $TagString = $PropertyValue
                         $TagString = $TagString.trimstart('[')
-                        $TagString = $TagString.trimstart(']')
+                        $TagString = $TagString.trimend(']')
+                        $TagString = $TagString.trim()
+                        $TagArray = $TagString.split(',')
                         
-                        $tags = foreach ($Tag in $TagString)
+                        write-debug "`$tagstring: <$tagstring>"
+                    
+                        $tags = foreach ($Tag in $TagArray)
                         {
-                            [PSCustomObject]@{Tag =$Tag}
+                            $Tag = $Tag.trim()
+                            $Tag = $Tag.trim('"')
+                            write-debug "`$tag: <$tag>"
+                            [PSCustomObject]@{Tag = $Tag}
                         }
                     }
                     # aliases CAN be multiple, but I've not coded for this yet

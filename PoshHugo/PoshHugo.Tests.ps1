@@ -1,20 +1,14 @@
 ﻿$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
+remove-module PoshHugo -verbose
+import-module PoshHugo -verbose
 $TestData = "$here\PesterData"
-. "$here\$sut"
-
-Describe "PoshHugo" {
-    It "does something useful" {
-        $true | Should Be $false
-    }
-}
+# . "$here\$sut"
 
 
-Describe "get-HugoNameAndValue" {
+Describe "get-HugoNameAndFirstLineValue" {
     It "returns name and value for a valid line" {
-        $Hugo = get-HugoNameAndValue -FrontMatterLine "Weighting: 103"
-        # [string]$name = $Hugo.name
-        # $name | Should Be 'Weighting'
+        $Hugo = get-HugoNameAndFirstLineValue -FrontMatterLine "Weight: 103"
         $value = $Hugo.PropertyValue
         $value | Should Be '103'
         # "103" | Should Be '103'
@@ -44,85 +38,86 @@ Describe "get-HugoContent" {
     It "returns title" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $title = $HugoContent.title
-        $title | Should Be 'xx'
+        $title | Should Be '10th June 1668 - Samuel Pepys visits Salisbury'
     }
 
     It "returns description" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $description = $HugoContent.description
-        $description | Should Be 'xx'
+        $description | Should Be ''
     }
+
 
     It "returns lastmod" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $lastmod = $HugoContent.lastmod
-        $lastmod | Should Be 'xx'
+        $lastmod | Should Be '2016-06-07'
     }
 
     It "returns date" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $date = $HugoContent.date
-        $date | Should Be 'xx'
+        $date | Should Be '2013-11-29'
     }
 
     It "returns tags" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $tags = $HugoContent.tags
-        $tags | Should Be 'xx'
+        $tags | Should Be ''
     }
 
     It "returns categories" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $categories = $HugoContent.categories
-        $categories | Should Be 'xx'
+        $categories | Should Be 'on-this-day'
     }
 
     It "returns aliases" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $aliases = $HugoContent.aliases
-        $aliases | Should Be 'xx'
+        $aliases | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
     }
 
     It "returns draft" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $draft = $HugoContent.draft
-        $draft | Should Be 'xx'
+        $draft | Should Be 'No'
     }
 
     It "returns publishdate" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $publishdate = $HugoContent.publishdate
-        $publishdate | Should Be 'xx'
+        $publishdate | Should Be '2013-11-29'
+    }
+
+    It "returns weighting" {
+        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
+        $Weight = $HugoContent.Weight
+        $Weight | Should Be '610'
     }
 
     It "returns markup" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $markup = $HugoContent.markup
-        $markup | Should Be 'xx'
+        $markup | Should Be 'Md'
     }
 
     It "returns url" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $url = $HugoContent.url
-        $url | Should Be 'xx'
+        $url | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
     }
 
     It "returns body" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $body = $HugoContent.body
-        $body | Should Be 'xx'
+        $body | Should Be ''
     }
 
     It "returns links" {
         $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $links = $HugoContent.links
-        $links | Should Be 'xx'
-    }
-
-    It "returns weighting" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
-        $Weighting = $HugoContent.Weighting
-        $Weighting | Should Be '610'
+        $links | Should Be ''
     }
 
     It "returns images" {

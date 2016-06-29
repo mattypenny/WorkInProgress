@@ -130,39 +130,6 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                 write-debug "`$PropertyValue: <$PropertyValue>"
 
 
-                <#
-                    if the Property name is null, either it's an invalid line
-                    or it's multiline
-                #>
-                if ($PropertyName -eq "")
-                {
-                    switch ($PropertyNameFromPreviousLine)
-                    {
-                        "tags"
-                        { 
-                            write-debug "in `$PropertyNameFromPreviosLine switch Tags"; 
-                            $TagString = "$TagString$PropertyValue"
-                        }
-                    
-                        "categories"
-                        { 
-                            write-debug "in `$PropertyNameFromPreviosLine switch categories"; 
-                            $aliases = "$CategoriesString$PropertyValue"
-                        }
-                    
-                        "aliases"
-                        { 
-                            write-debug "in `$PropertyNameFromPreviosLine switch Aliases"; 
-                            $aliases = "$AliasesString$PropertyValue"
-                        }
-                        "default"
-                        {
-                            write-error "There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
-                        }
-                   } 
-                }
-                $PropertyNameFromPreviousLine = $PropertyName
-
                 
                     
                 
@@ -230,45 +197,48 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                         write-debug "in switch"; 
                         $url = $PropertyValue 
                     }  
+                    <#
+                        if the Property name is null, either it's an invalid line
+                        or it's multiline
+                    #>
+                    ""
+                    {
+                        switch ($PropertyNameFromPreviousLine)
+                        {
+                            "tags"
+                            { 
+                                write-debug "in `$PropertyNameFromPreviosLine switch Tags"; 
+                                $TagString = "$TagString$PropertyValue"
+                            }
+                    
+                            "categories"
+                            { 
+                                write-debug "in `$PropertyNameFromPreviosLine switch categories"; 
+                                $aliases = "$CategoriesString$PropertyValue"
+                            }
+                    
+                            "aliases"
+                            { 
+                                write-debug "in `$PropertyNameFromPreviosLine switch Aliases"; 
+                                $aliases = "$AliasesString$PropertyValue"
+                            }
+                            "default"
+                            {
+                                write-error "There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                            }
+                         } 
+                    }
+
+                
                     Default
                     { 
-                        if ($MultiLinePropertyName -eq "")
-                        {
-                            write-debug "Unknown property"
-                            $UnknownProperty = $PropertyValue 
-                        }
-                        elseif ($MultiLinePropertyName -eq "tags")
-                        {
-                            if ($PropertyValue -notcontains ']' )
-                            {
-                                $MultiLinePropertyName = ""
-                            }
-
-                            $TagString = $PropertyValue
-                            $TagString = $TagString.trimstart('[')
-                            $TagString = $TagString.trimend(']')
-                            $TagString = $TagString.trim()
-                            $TagArray = $TagString.split(',')
-                        
-                            write-debug "`$tagstring: <$tagstring>"
-                    
-                            $Element = -1
-                            $tags = foreach ($Tag in $TagArray)
-                            {
-                              $Element++
-                              $Tag = $Tag.trim()
-                              $Tag = $Tag.trim('"')
-                              write-debug "`$tag: <$tag>"
-                              $TagArray[$Element] = $Tag
-
-                            }
-#>
-                            $Tags = $TagArray
+                                write-error "There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                    }
                             
 
-                        }
-                    }  
-                }    
+                }
+            $PropertyNameFromPreviousLine = $PropertyName
+
             }
             elseif ($YamlDividingLines -gt 1)
             {

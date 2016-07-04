@@ -127,3 +127,46 @@ Describe "get-HugoContent" {
     }
 
 }
+
+
+Describe "get-HugoValueArrayFromString" {
+    It "returns an array of values from a comma seperated list of tags when there are many values" {
+        $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys", "literary", "visitors"," old george mall", "high street" ]'
+        $HugoValueArray.length | Should be 5
+        $HugoValueArray[0] | Should be "pepys"
+        $HugoValueArray[1] | Should be "literary"
+        $HugoValueArray[2] | Should be "visitors"
+        $HugoValueArray[3] | Should be "old george mall"
+        $HugoValueArray[4] | Should be "high street"
+        
+    }
+    It "returns an array of values from a dash seperated list of tags when there are many values" {
+        $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys", "literary", "visitors"," old george mall", "high street" ]'
+        $HugoValueArray.length | Should be 5
+        $HugoValueArray[0] | Should be "pepys"
+        $HugoValueArray[1] | Should be "literary"
+        $HugoValueArray[2] | Should be "visitors"
+        $HugoValueArray[3] | Should be "old george mall"
+        $HugoValueArray[4] | Should be "high street"
+        
+    }
+        It "returns one values from a comma seperated list of tags when there is only one value" {
+        $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys", ]'
+        $HugoValueArray.length | Should be 1
+        $HugoValueArray[0] | Should be "pepys"
+        
+    }
+        It "returns one value when the string is just one word, with no comma seperation" {
+        $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys" ]'
+        $HugoValueArray.length | Should be 1
+        $HugoValueArray[0] | Should be "pepys"
+        
+    }
+        It "returns one value when the string is just one word, with no comma seperation and no brackets" {
+        $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString ' "pepys" '
+        $HugoValueArray.length | Should be 1
+        $HugoValueArray[0] | Should be "pepys"
+        
+    }
+
+}

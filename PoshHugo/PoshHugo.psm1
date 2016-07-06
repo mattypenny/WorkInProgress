@@ -105,11 +105,6 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
         $CategoriesString = ""
         $AliasesString = ""
                
-        # There are two passes through the $MarkdownLine. The first captures the
-        # 'simple' fields. The second captures fields which could have multiple 
-        # values, and possibly be split across multiple lines
-        #
-        # First Pass - simple values
         foreach ($MarkdownLine in $MarkDownLines)
         {
             [string]$Line = $MarkdownLine.Line
@@ -208,7 +203,7 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                             "tags"
                             { 
                                 write-debug "in `$PropertyNameFromPreviosLine switch Tags"; 
-                                $TagString = "$TagString$PropertyValue"
+                                $TagString = "$TagString, $PropertyValue"
                             }
                     
                             "categories"
@@ -220,7 +215,7 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                             "aliases"
                             { 
                                 write-debug "in `$PropertyNameFromPreviosLine switch Aliases"; 
-                                $aliases = "$AliasesString$PropertyValue"
+                                $aliases = "$AliasesString, $PropertyValue"
                             }
                             "default"
                             {
@@ -250,26 +245,8 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
             }
         }
 
-<#
-???turn this into a function
-                        $TagString = $TagString.trimstart('[')
-                        $TagString = $TagString.trimend(']')
-                        $TagString = $TagString.trim()
-                        $TagArray = $TagString.split(',')
-                        
-                        write-debug "`$tagstring: <$tagstring>"
-                    
-                        $Element = -1
-                        $tags = foreach ($Tag in $TagArray)
-                        {
-                            $Element++
-                            $Tag = $Tag.trim()
-                            $Tag = $Tag.trim('"')
-                            write-debug "`$tag: <$tag>"
-                            $TagArray[$Element] = $Tag
+        $TagArray = convert-HugoDelimitedQuotedStringIntoAnArray -String $TagString 
 
-                        }
-#>
                         $Tags = $TagString
                         $Aliases = $AliasesString
                         $Categories = $CategoriesString
@@ -342,4 +319,53 @@ function get-HugoNameAndFirstLineValue {
   }
 
 }
+
+
+function get-HugoValueArrayFromString {
+
+<#
+.SYNOPSIS
+  
+.DESCRIPTION
+  
+
+.PARAMETER MultipleValueString
+  Folder 
+
+.EXAMPLE
+#>
+  [CmdletBinding()]
+  Param( [string]$MultipleValueString = '[ "pepys", "literary", "visitors"," old george mall", "high street" ]',
+         [string]$Delimiter = ',')
+  
+  write-startfunction
+
+  $MultipleValueString = $MultipleValueString.trimstart('[')
+  $MultipleValueString = $MultipleValueString.trimend(']')
+  $MultipleValueString = $MultipleValueString.trim()
+  $TagArray = $MultipleValueString.split($Delimiter)
+                        
+  
+  write-debug "`$tagstring: <$tagstring>"
+
+
+  $CleanedUpTagArray = @{}                     
+  $Element = -1
+  $tags = foreach ($Tag in $TagArray)
+  {
+    write-debug "1: `$tag: <$tag>"
+    $Tag = $Tag.trim()
+    write-debug "2: `$tag: <$tag>"
+    $Tag = $Tag.trim('"')
+    $Tag = $Tag.trim()
+    write-debug "3: `$tag: <$tag>"
+    if ($Tag -ne "")
+    {
+      $Element++
+      $CleanedUpTagArray[$Element] = $Tag
+    }
+  }
+  return $CleanedUpTagArray
+}
+#>
 

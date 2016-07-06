@@ -132,7 +132,7 @@ Describe "get-HugoContent" {
 Describe "get-HugoValueArrayFromString" {
     It "returns an array of values from a comma seperated list of tags when there are many values" {
         $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys", "literary", "visitors"," old george mall", "high street" ]'
-        $HugoValueArray.length | Should be 5
+        $HugoValueArray.count | Should be 5
         $HugoValueArray[0] | Should be "pepys"
         $HugoValueArray[1] | Should be "literary"
         $HugoValueArray[2] | Should be "visitors"
@@ -141,18 +141,17 @@ Describe "get-HugoValueArrayFromString" {
         
     }
     It "returns an array of values from a dash seperated list of tags when there are many values" {
-        $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys", "literary", "visitors"," old george mall", "high street" ]'
-        $HugoValueArray.length | Should be 5
-        $HugoValueArray[0] | Should be "pepys"
-        $HugoValueArray[1] | Should be "literary"
-        $HugoValueArray[2] | Should be "visitors"
-        $HugoValueArray[3] | Should be "old george mall"
-        $HugoValueArray[4] | Should be "high street"
+        $HugoValueArray = get-HugoValueArrayFromString -DElimiter '-' -MultipleValueString '- "roadname" - "onthisday" - "stonehengeseverywhere" -"unknown"'
+        $HugoValueArray.count | Should be 4
+        $HugoValueArray[0] | Should be "roadname"
+        $HugoValueArray[1] | Should be "onthisday"
+        $HugoValueArray[2] | Should be "stonehengeseverywhere"
+        $HugoValueArray[3] | Should be "unknown"
         
     }
-        It "returns one values from a comma seperated list of tags when there is only one value" {
+        It "returns one value from a comma seperated list of tags when there is only one value" {
         $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys", ]'
-        $HugoValueArray.length | Should be 1
+        $HugoValueArray.count | Should be 1
         $HugoValueArray[0] | Should be "pepys"
         
     }
@@ -166,6 +165,18 @@ Describe "get-HugoValueArrayFromString" {
         $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString ' "pepys" '
         $HugoValueArray.length | Should be 1
         $HugoValueArray[0] | Should be "pepys"
+        
+    }
+        It "should not throw an error when the string is blank" {
+        {get-HugoValueArrayFromString -MultipleValueString '  '} | Should Not Throw
+       
+        
+    }
+
+        It "returns nothing when the string is blank" {
+        $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '  '
+        $HugoValueArray.count | Should be 0
+        $HugoValueArray[0] | Should benullOrEmpty
         
     }
 

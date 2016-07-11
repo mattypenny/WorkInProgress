@@ -34,98 +34,95 @@ url: /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
 #>
 
 Describe "get-HugoContent" {
+    
+    $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md
 
     It "returns title" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $title = $HugoContent.title
         $title | Should Be '10th June 1668 - Samuel Pepys visits Salisbury'
     }
 
     It "returns description" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $description = $HugoContent.description
         $description | Should Be ''
     }
 
 
     It "returns lastmod" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $lastmod = $HugoContent.lastmod
         $lastmod | Should Be '2016-06-07'
     }
 
     It "returns date" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $date = $HugoContent.date
         $date | Should Be '2013-11-29'
     }
 
     It "returns tags" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $tags = $HugoContent.tags
+        $tags[0] | Should be "pepys"
+        $tags[1] | Should be "literary"
+        $tags[2] | Should be "visitors"
+        $tags[3] | Should be "old george mall"
+        $tags[4] | Should be "high street"
+
         $tags | Should Be ''
     }
 
     It "returns categories" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $categories = $HugoContent.categories
-        $categories | Should Be 'on-this-day'
+        $ExpectedCategories = @("on-this-day", "june", "diaries and things", "dummy")
+        $Comparison = Compare-Object $categories $ExpectedCategories
+        $Comparison.InputObject | Should Be "dummy"
+        $Comparison.SideIndicator | Should Be "=>"
     }
 
     It "returns aliases" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $aliases = $HugoContent.aliases
         $aliases | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
     }
 
     It "returns draft" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $draft = $HugoContent.draft
         $draft | Should Be 'No'
     }
 
     It "returns publishdate" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $publishdate = $HugoContent.publishdate
         $publishdate | Should Be '2013-11-29'
     }
 
     It "returns weighting" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $Weight = $HugoContent.Weight
         $Weight | Should Be '610'
     }
 
     It "returns markup" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $markup = $HugoContent.markup
         $markup | Should Be 'Md'
     }
 
     It "returns url" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $url = $HugoContent.url
         $url | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
     }
 
     It "returns body" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $body = $HugoContent.body
         $body | Should Be ''
     }
 
     It "returns links" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
         $links = $HugoContent.links
         $links | Should Be ''
     }
 
     It "returns images" {
-        $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md 
-        $images = $HugoContent.images
+         
         $images | Should Be '610'
     }
-
+    <#
+    #>
 }
 
 

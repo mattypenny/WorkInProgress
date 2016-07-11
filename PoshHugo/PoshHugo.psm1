@@ -124,11 +124,6 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                 write-debug "`$PropertyName: <$PropertyName>"
                 write-debug "`$PropertyValue: <$PropertyValue>"
 
-
-                
-                    
-                
-                
                 $PropertyCount = $PropertyCount + 1
             
                 
@@ -167,6 +162,12 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                         write-debug "in switch"; 
                         $aliasesString = $PropertyValue 
                     }
+                    "categories"
+                    { 
+                        write-debug "in switch"; 
+                        $categoriesString = $PropertyValue 
+                    }
+                
                     "draft"
                     { 
                         write-debug "in switch"; 
@@ -202,24 +203,29 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                         {
                             "tags"
                             { 
-                                write-debug "in `$PropertyNameFromPreviosLine switch Tags"; 
+                                write-debug "in `$PropertyNameFromPreviousLine switch Tags"; 
                                 $TagString = "$TagString, $PropertyValue"
                             }
                     
                             "categories"
                             { 
-                                write-debug "in `$PropertyNameFromPreviosLine switch categories"; 
-                                $aliases = "$CategoriesString$PropertyValue"
+                                write-debug "in `$PropertyNameFromPreviousLine switch categories `$PropertyValue: <$PropertyValue>"; 
+                                
+                                $StartofValue = $PropertyValue.indexof('-') + 1 
+                                $PropertyValue = $PropertyValue.substring($StartOfValue, $PropertyValue.length - $StartOfValue)
+                                $CategoriesString = "$CategoriesString~$PropertyValue"
+                                write-debug "in `$PropertyNameFromPreviousLine switch: `$CategoriesString: <$CategoriesString>"; 
                             }
                     
                             "aliases"
                             { 
-                                write-debug "in `$PropertyNameFromPreviosLine switch Aliases"; 
-                                $aliases = "$AliasesString, $PropertyValue"
+                                write-debug "in `$PropertyNameFromPreviousLine switch Aliases"; 
+                                $aliasesString = "$AliasesString, $PropertyValue"
                             }
                             "default"
                             {
-                                write-error "There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                                write-error "ERR010: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                                write-error "ERR010: `$PropertyNameFromPreviousLine: <$PropertyNameFromPreviousLine>"
                             }
                          } 
                     }
@@ -227,12 +233,15 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                 
                     Default
                     { 
-                                write-error "There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                                write-error "ERR020: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
                     }
                             
 
                 }
-            $PropertyNameFromPreviousLine = $PropertyName
+            if ($PropertyName)
+            {
+                $PropertyNameFromPreviousLine = $PropertyName
+            }
 
             }
             elseif ($YamlDividingLines -gt 1)
@@ -245,21 +254,19 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
             }
         }
 
-        $TagArray = convert-HugoDelimitedQuotedStringIntoAnArray -String $TagString 
+        $TagsArray = get-HugoValueArrayFromString -MultipleValueString $TagString -DElimiter ','
+        $AliasesArray = get-HugoValueArrayFromString -MultipleValueString $AliasesString ','
+        $CategoriesArray = get-HugoValueArrayFromString -MultipleValueString $CategoriesString '~'
 
-                        $Tags = $TagString
-                        $Aliases = $AliasesString
-                        $Categories = $CategoriesString
 
         [PSCustomObject]@{
             title = $title        
             description = $description
             lastmod = $lastmod
             date = $date
-            tags = $tags
-            # # categories = $categories
-            # aliases CAN be multiple, but I've not coded for this yet
-            aliases = $aliases 
+            tags = $tagsArray
+            categories = $categoriesArray
+            aliases = $aliasesArray
             draft = $draft
             publishdate = $publishdate
             weight = $weight 
@@ -313,6 +320,8 @@ function get-HugoNameAndFirstLineValue {
   $PropertyValue = $PropertyValue.trimstart('"') 
   $PropertyValue = $PropertyValue.trimend('"') 
 
+  write-debug "Returning PropertyName <$PropertyName> PropertyValue <$PropertyValue>"
+
   [PSCustomObject]@{ 
     PropertyName = $PropertyName
     PropertyValue = $PropertyValue 
@@ -340,32 +349,31 @@ function get-HugoValueArrayFromString {
   
   write-startfunction
 
+  write-debug "`$MultipleValueString: <$MultipleValueString>"
   $MultipleValueString = $MultipleValueString.trimstart('[')
   $MultipleValueString = $MultipleValueString.trimend(']')
   $MultipleValueString = $MultipleValueString.trim()
-  $TagArray = $MultipleValueString.split($Delimiter)
+  $ValueArray = $MultipleValueString.split($Delimiter)
                         
   
-  write-debug "`$tagstring: <$tagstring>"
+  write-debug "`$MultipleValueString: <$MultipleValueString>"
 
 
-  $CleanedUpTagArray = @{}                     
-  $Element = -1
-  $tags = foreach ($Tag in $TagArray)
+  $CleanedUpMultipleValueString = @{}                     
+  $Values = foreach ($Value in $ValueArray)
   {
-    write-debug "1: `$tag: <$tag>"
-    $Tag = $Tag.trim()
-    write-debug "2: `$tag: <$tag>"
-    $Tag = $Tag.trim('"')
-    $Tag = $Tag.trim()
-    write-debug "3: `$tag: <$tag>"
-    if ($Tag -ne "")
+    write-debug "1: `$Value: <$Value>"
+    $Value = $Value.trim()
+    write-debug "2: `$Value: <$Value>"
+    $Value = $Value.trim('"')
+    $Value = $Value.trim()
+    write-debug "3: `$Value: <$Value>"
+    if ($Value -ne "")
     {
-      $Element++
-      $CleanedUpTagArray[$Element] = $Tag
+      $Value 
     }
   }
-  return $CleanedUpTagArray
+  return $Values
 }
 #>
 

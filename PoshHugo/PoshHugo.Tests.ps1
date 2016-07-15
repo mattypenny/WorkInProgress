@@ -66,7 +66,7 @@ Describe "get-HugoContent" {
         $tags[3] | Should be "old george mall"
         $tags[4] | Should be "high street"
 
-        $tags | Should Be ''
+        
     }
 
     It "returns categories" {
@@ -78,8 +78,11 @@ Describe "get-HugoContent" {
     }
 
     It "returns aliases" {
-        $aliases = $HugoContent.aliases
-        $aliases | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
+        $Content = $HugoContent.aliases
+        $ExpectedContent = @("/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury", "/about-Pepys-and-Salisbury", "dummy")
+        $Comparison = Compare-Object $Content $ExpectedContent
+        $Comparison.InputObject | Should Be "dummy"
+        $Comparison.SideIndicator | Should Be "=>" 
     }
 
     It "returns draft" {

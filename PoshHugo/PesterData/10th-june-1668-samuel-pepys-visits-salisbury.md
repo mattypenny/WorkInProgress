@@ -3,10 +3,14 @@ title: "10th June 1668 - Samuel Pepys visits Salisbury"
 description: ""
 lastmod: "2016-06-07"
 date: "2013-11-29"
-tags: [  ]
+tags: [ "pepys", "literary", "visitors",
+"old george mall", "high street" ]
 categories: 
  - "on-this-day"
-aliases: ["/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury"]
+ - "june"
+ - "diaries and things"
+aliases: ["/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury",
+          "/about-Pepys-and-Salisbury]
 draft: No
 publishdate: "2013-11-29"
 weight: 610

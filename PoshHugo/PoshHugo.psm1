@@ -50,21 +50,55 @@ function get-HugoContent {
 .PARAMETER HugoMarkdownFile
 
 .EXAMPLE
-     get-HugoFrontMatter -f D:\hugo\sites\example.com\content\on-this-day\10th-june-1668-samuel-pepys-visits-salisbury.md
-  title       :  "10th June 1668 - Samuel Pepys visits Salisbury"
-description :  ""
-lastmod     :  "2016-06-07"
-date        :  "2013-11-29"
-aliases     :  ["/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury"]
-draft       :  No
-publishdate :  "2013-11-29"
-weight      :  610
-markup      :  "md"
-url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
+     get-HugoContent -HugoMarkDownFile D:\hugo\sites\example.com\content\on-this-day\10th-june-1668-samuel-pepys-visits-salisbury.md
+
+title           : 10th June 1668 - Samuel Pepys visits Salisbury
+description     : 
+lastmod         : 2016-06-07
+date            : 2013-11-29
+tags            : {pepys, literary, old george mall}
+categories      : on-this-day
+aliases         : /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
+draft           : No
+publishdate     : 2013-11-29
+weight          : 610
+markup          : md
+url             : /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
+unknownproperty : 
+content         : 
+                  
+                  <a href="/images/Pepys_portrait_by_Kneller.png"><img src="/images/Pepys_portrait_by_Kneller-254x300.png" 
+                  alt="Pepys_portrait_by_Kneller" width="254" height="300" class="alignright size-medium wp-image-9038" /></a></a>On the 10th June 
+                  1667, Samuel Pepys stayed that night at the Old George Inn, now the Boston Tea Party cafe<a name="Source1" href="#Note1">[1]</a>.
+                  
+                  He had visited Old Sarum. The 'prodigous' 'great fortifications' did 'afright' him<a name="Source2" href="#Note2">[2]</a>  
+                  
+                  Full text
+                  > 
+                  > 10th. So come to Hungerford, where very good trouts, eels, and cray- fish.  Dinner:  a mean town.  At dinner there, 12s.  
+                  Thence set out with a guide, who saw us to Newmarket-heath, and then left us, 3s. 6d.  
+                  > 
+                  > So all over the plain by the sight of the steeple (the plain high and low) to Salisbury by night; but before I came to the 
+                  town, I saw a great fortification, and there light, and to it and in it; and find it prodigious, so as to fright me to be in it 
+                  all alone at that time of night, it being dark.  I understand since it to be that that is called Old Sarum.  
+                  > 
+                  > Come to the George Inne, where lay in a silk bed; and very good diet.  To supper; then to bed.
 
 
 .EXAMPLE
-    Another example of how to use this cmdlet
+    $otd = get-HugoContent -f D:\hugo\sites\example.com\content\on-this-day\*July*    
+    $otd | select date, title, weight | ft -AutoSize
+
+date       title                                                                                                                  weight           
+----       -----                                                                                                                  ------           
+2014-02-26 6th July 1893 - Salisbury celebrates marriage of Duke of York to Princess Mary                                         706              
+2013-11-04 22nd July 1654 - diarist John Evelyn visits Stonehenge                                                                 722              
+2013-11-15 10th July 1899 - Barnum & Bailey's Greatest Show on Earth visits Salisbury                                             710              
+2013-12-04 1st July 1906 - Salisbury rail disaster                                                                                701              
+2013-12-04 1st July 1875 - Fisherton Jail opens to visitors                                                                       701              
+2013-12-04 3rd July 1997 - the Independent reports that Gigant St brewery is closing                                              703              
+2013-12-04 8th July 1858 - Bishop Hamilton consecrates the new Saint Andrew's Church                                              708              
+2013-12-04 11th July 2012 - the Olympic torch arrives in Salisbury                                                                711 
 #>
     [CmdletBinding()]
     Param( [string][Alias ("f")]$HugoMarkdownFile = "$pwd"  ) 
@@ -96,7 +130,7 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
         $weight = ""
         $markup = ""
         $url = ""
-        $content = ""
+        $body = ""
            
         <#
             Initialize the potentially multi-value and/or multi-line properties
@@ -238,21 +272,27 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
                             
 
                 }
-            if ($PropertyName)
-            {
-                $PropertyNameFromPreviousLine = $PropertyName
-            }
+                if ($PropertyName)
+                {
+                    $PropertyNameFromPreviousLine = $PropertyName
+                }
 
             }
             elseif ($YamlDividingLines -gt 1)
             {
                 <#
-                    The front matter is over, so the rest is content
+                    The front matter is over, so the rest is body
                 #>
-                write-debug "Adding to content"    
+                write-debug "Adding to content"
+                $Content = @"
+$Content
+$Line
+"@
 
             }
         }
+
+        $Content = $Content.trim('_')
 
         $TagsArray = get-HugoValueArrayFromString -MultipleValueString $TagString -DElimiter ','
         $AliasesArray = get-HugoValueArrayFromString -MultipleValueString $AliasesString ','
@@ -273,6 +313,7 @@ url         :  /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
             markup = $markup
             url = $url
             unknownproperty = $unknownproperty
+            content = $Content
         }
             
     }

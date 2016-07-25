@@ -65,7 +65,7 @@ weight          : 610
 markup          : md
 url             : /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
 unknownproperty : 
-content         : 
+body            : 
                   
                   <a href="/images/Pepys_portrait_by_Kneller.png"><img src="/images/Pepys_portrait_by_Kneller-254x300.png" 
                   alt="Pepys_portrait_by_Kneller" width="254" height="300" class="alignright size-medium wp-image-9038" /></a></a>On the 10th June 
@@ -283,16 +283,16 @@ date       title                                                                
                 <#
                     The front matter is over, so the rest is body
                 #>
-                write-debug "Adding to content"
-                $Content = @"
-$Content
+                write-debug "Adding to body"
+                $Body = @"
+$Body
 $Line
 "@
 
             }
         }
 
-        $Content = $Content.trim('_')
+        $Body = $Body.trim('_')
 
         $TagsArray = get-HugoValueArrayFromString -MultipleValueString $TagString -DElimiter ','
         $AliasesArray = get-HugoValueArrayFromString -MultipleValueString $AliasesString ','
@@ -313,7 +313,7 @@ $Line
             markup = $markup
             url = $url
             unknownproperty = $unknownproperty
-            content = $Content
+            body = $body
         }
             
     }

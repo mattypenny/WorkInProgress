@@ -33,7 +33,7 @@ markup: "md"
 url: /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
 #>
 
-Describe "get-HugoContent" {
+Describe "get-HugoContent for a single file" {
     
     $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md
 
@@ -61,6 +61,7 @@ Describe "get-HugoContent" {
     It "returns tags" {
         $tags = $HugoContent.tags
         $tags[0] | Should be "pepys"
+
         $tags[1] | Should be "literary"
         $tags[2] | Should be "visitors"
         $tags[3] | Should be "old george mall"
@@ -109,10 +110,14 @@ Describe "get-HugoContent" {
         $url = $HugoContent.url
         $url | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
     }
-
+<#
     It "returns body" {
-        $body = $HugoContent.body
-        $body | Should Be ''
+        [string]$ExpectedBody = get-content $TestData\Pepys-Body.txt
+        [string]$body = $HugoContent.body
+        $BodyFirst = $Body.Substring(1,10)
+        $ExpectedBodyFirst = $ExpectedBody.Substring(1,10)
+
+        $bodyFirst | Should Be $ExpectedBodyFirst
     }
 
     It "returns links" {
@@ -128,6 +133,15 @@ Describe "get-HugoContent" {
     #>
 }
 
+Describe "get-HugoContent for multiple file" {
+    
+    $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md
+
+    It "returns title" {
+        $title = $HugoContent.title
+        $title | Should Be '10th June 1668 - Samuel Pepys visits Salisbury'
+    }
+}
 
 Describe "get-HugoValueArrayFromString" {
     It "returns an array of values from a comma seperated list of tags when there are many values" {
@@ -151,20 +165,17 @@ Describe "get-HugoValueArrayFromString" {
     }
         It "returns one value from a comma seperated list of tags when there is only one value" {
         $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys", ]'
-        $HugoValueArray.count | Should be 1
-        $HugoValueArray[0] | Should be "pepys"
+        $HugoValueArray | Should be "pepys"
         
     }
         It "returns one value when the string is just one word, with no comma seperation" {
         $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '[ "pepys" ]'
-        $HugoValueArray.length | Should be 1
-        $HugoValueArray[0] | Should be "pepys"
+        $HugoValueArray | Should be "pepys"
         
     }
         It "returns one value when the string is just one word, with no comma seperation and no brackets" {
         $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString ' "pepys" '
-        $HugoValueArray.length | Should be 1
-        $HugoValueArray[0] | Should be "pepys"
+       $HugoValueArray | Should be "pepys"
         
     }
         It "should not throw an error when the string is blank" {
@@ -176,8 +187,54 @@ Describe "get-HugoValueArrayFromString" {
         It "returns nothing when the string is blank" {
         $HugoValueArray = get-HugoValueArrayFromString -MultipleValueString '  '
         $HugoValueArray.count | Should be 0
-        $HugoValueArray[0] | Should benullOrEmpty
+        $HugoValueArray | Should benullOrEmpty
         
+    }
+
+}
+
+Describe "get-HugoContent for multiple files" {
+    
+    
+    
+        
+
+    It "returns title" {
+        $HugoTitles = get-HugoContent -f $TestData\*.md | select title
+        
+        $ExpectedTitles = @("10th August 1901 - Miss Moberly meets Marie Antoinette",               
+                            "10th June 1668 - Samuel Pepys visits Salisbury",                      
+                            "15th June 1786 - Matcham meets 'the Dead Drummer', possibly",          
+                            "1st May 472 - the 'Night of the Long Knives' at Amesbury",             
+                            "3rd June 1977 - the Ramones visit Stonehenge. Johnny stays on the bus",
+                            "dummy"
+                            )
+        $ExpectedTitles
+        $Comparison = Compare-Object $HugoTitles.title $ExpectedTitles
+    
+        $Comparison.InputObject | Should Be "dummy"
+        $Comparison.SideIndicator | Should Be "=>" 
+    
+    }
+}
+
+Describe "get-HugoContent for a single file - body processing" {
+    
+    $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md
+    [string]$ExpectedBody = get-content $TestData\Pepys-Body.txt
+    [string]$body = $HugoContent.body
+
+    It "returns the first 10 characters" {
+        
+        $BodyFirst = $Body.Substring(1,10)
+        $ExpectedBodyFirst = $ExpectedBody.Substring(1,10)
+        $bodyFirst | Should Be $ExpectedBodyFirst
+    }
+    It "returns the same length" {
+        
+        $BodyLength = $Body.length
+        $ExpectedBodyLength = $ExpectedBody.length
+        $bodyLength | Should Be $ExpectedBodyLength
     }
 
 }

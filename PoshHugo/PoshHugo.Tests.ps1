@@ -5,6 +5,7 @@ import-module PoshHugo -verbose
 $TestData = "$here\PesterData"
 # . "$here\$sut"
 
+$HugoContentFolder = "D:\hugo\sites\example.com\content\on-this-day\"
 
 Describe "get-HugoNameAndFirstLineValue" {
     It "returns name and value for a valid line" {
@@ -221,14 +222,18 @@ Describe "get-HugoContent for multiple files" {
 Describe "get-HugoContent for a single file - body processing" {
     
     $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md
-    [string]$ExpectedBody = get-content $TestData\Pepys-Body.txt
+    [string]$ExpectedBody = get-content -encoding default $TestData\Pepys-Body.txt
     [string]$body = $HugoContent.body
 
     It "returns the first 10 characters" {
         
-        $BodyFirst = $Body.Substring(1,10)
-        $ExpectedBodyFirst = $ExpectedBody.Substring(1,10)
+        $BodyFirst = $Body.Substring(0,10)
+        $ExpectedBodyFirst = $ExpectedBody.Substring(0,10)
         $bodyFirst | Should Be $ExpectedBodyFirst
+    }
+    It "returns the first character" {
+        
+        [byte][char]$Body[0] | Should Be $([byte][char]$ExpectedBody[0])
     }
     It "returns the same length" {
         
@@ -237,4 +242,112 @@ Describe "get-HugoContent for a single file - body processing" {
         $bodyLength | Should Be $ExpectedBodyLength
     }
 
+}
+
+Describe "set-HugoContent backs up an existing file" {
+    It "creates a backup copy of the existing file" {
+ 
+        $Now = get-date -uformat "%Y%m%d%H%M"
+        
+        $HugoParameters = @{
+            HugoMarkdownFile = "c:\temp\markdown_file.md"
+            aliases = 'xx'
+            body = 'xx'
+            categories = 'xx'
+            date = 'xx'
+            description = 'xx'
+            draft = 'xx'
+            lastmod = 'xx'
+            markup = 'xx'
+            publishdate = 'xx'
+            tags = "hippy","wiltshire","stonehenge"
+            title = 'xx'
+            unknownproperty = 'xx'
+            url = 'xx'
+            weight = 'xx'
+            nobackup = $False
+        }
+        set-HugoContent @HugoParameters
+
+        $(test-path "c:\temp\old\markdown_file.md_$Now") | Should Be $true
+    }
+}
+
+Describe "set-HugoContent" {
+ 
+    $Now = get-date -uformat "%Y%m%d%H%M"
+    $HugoFile = "$HugoContentFolder\elvis-visits-Salisbury.md"
+
+    $HugoParameters = @{
+        HugoMarkdownFile = "$HugoFile"
+        aliases = '["/on-this-day/theking"]'
+        body = 'This is a test post - sadly Elvis never got to visit Salisbury'
+        categories = 'on-this-day'
+        date = '2016-08-25'
+        description = ''
+        draft = 'No'
+        lastmod = '2016-08-25'
+        markup = 'md'
+        publishdate = '2016-08-25'
+        tags = "elvis","wiltshire","salisbury"
+        title = 'Elvis Presley visits Salisbury (this is a test)'
+        unknownproperty = 'xx'
+        url = '/on-this-day/june/elvis-visits-salisbury'
+        weight = '1'
+        nobackup = $False
+        }
+        set-HugoContent @HugoParameters
+
+    It "creates a backup copy of the existing file" {
+        $(test-path "D:\hugo\sites\example.com\content\on-this-day\old\elvis-visits-Salisbury.md_$Now") | Should Be $true
+    }
+    It "creates a markdown file" {
+        $(test-path "$HugoFile") | Should Be $true
+    }
+
+    It "creates a markdown file whtat works with Hugo (if Hugo is running!)" {
+        $WebPage = invoke-webrequest http://localhost:1313/on-this-day/june/elvis-visits-salisbury/ 
+        
+        $WebPage.RawContentLength | Should Be 2229
+    }
+    It "populates the Hugo fields" -testcases @{Key = "title"; ExpectedValue = "Elvis Presley visits Salisbury (this is a test)" },
+                                              @{Key = "title"; ExpectedValue = "Elvis Presley visits Salisbury (this is a test)" } -test {
+        param ([string]$Key,
+               [string]$ExpectedValue)
+ 
+        write-host "`$Key: <$Key>"
+        write-host "`$ExpectedValue: <$ExpectedValue>"
+        $ReturnedString = select-string  -pattern "$key  *:" $HugoFile
+
+        $($ReturnedString | measure-object).count | Should Be 1
+
+        [string]$Line = $ReturnedString.line
+        write-host "`$Line: <$Line>"
+        $value = $Line.split(":")[1]
+        $Value = $Value.trim()
+       
+        $Value | Should Be $ExpectedValue
+
+    }
+<#
+title           : Elvis Presley visits Salisbury (this is a test)
+description     : 
+lastmod         : 2016-08-25
+date            : 2016-08-25
+tags            : 
+ - "elvis" 
+ - "wiltshire" 
+ - "salisbury"
+categories      : 
+ - "on-this-day"
+aliases         : 
+ - "on-this-day"
+draft           : No
+publishdate     : 2016-08-25
+weight          : 1
+markup          : md
+url             : /on-this-day/june/elvis-visits-salisbury
+---
+This is a test post - sadly Elvis never got to visit Salisbury
+#>
 }

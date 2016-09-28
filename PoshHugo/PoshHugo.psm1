@@ -109,7 +109,8 @@ date       title                                                                
 
     foreach ($File in $Files)
     {
-        $MarkdownLines = select-string -pattern '^' $File 
+        # $MarkdownLines = select-string -pattern '^' $File -encoding ascii
+        $MarkdownLines = select-string -pattern '^' $File -encoding ascii
 
         $NumberOfMarkDownLines = $MarkdownLines | measure-object -Line
         write-debug "`$NumberOfMarkDownLines: $NumberOfMarkDownLines"
@@ -146,153 +147,155 @@ date       title                                                                
             {
                 $YamlDividingLines = $YamlDividingLines + 1
             }
-            if ($YamlDividingLines -eq 1 -and $Line.trim() -ne "")
+            else
             {
-
-                <#
-                    Retrieve Property Name and Line i.e. key and value
-                #>
-                $HugoNameAndValue = get-HugoNameAndFirstLineValue -FrontMatterLine $Line
-                [string]$PropertyName = $HugoNameAndValue.Propertyname
-                [string]$PropertyValue = $HugoNameAndValue.PropertyValue
-                write-debug "`$PropertyName: <$PropertyName>"
-                write-debug "`$PropertyValue: <$PropertyValue>"
-
-                $PropertyCount = $PropertyCount + 1
-            
-                
-                switch ($PropertyName) 
+                if ($YamlDividingLines -eq 1 -and $Line.trim() -ne "")
                 {
-                    "title" 
-                    { 
-                        write-debug "in switch"; 
-                        $title = $PropertyValue 
-                    }
-                    "description"
-                    { 
-                        write-debug "description - in switch"; 
-                        $description = $PropertyValue 
-                    }
-                    "lastmod"
-                    { 
-                        write-debug "in switch"; 
-                        $lastmod = $PropertyValue 
-                    }
-                    "date"
-                    { 
-                        write-debug "in switch"; 
-                        $date = $PropertyValue 
-                    }
-                    "tags" 
-                    {
-                        
-                        write-debug "in switch"; 
-                        $TagString = $PropertyValue
-                        
-                    }
-                    # aliases CAN be multiple, but I've not coded for this yet
-                    "aliases"
-                    { 
-                        write-debug "in switch"; 
-                        $aliasesString = $PropertyValue 
-                    }
-                    "categories"
-                    { 
-                        write-debug "in switch"; 
-                        $categoriesString = $PropertyValue 
-                    }
-                
-                    "draft"
-                    { 
-                        write-debug "in switch"; 
-                        $draft = $PropertyValue 
-                    }
-                    "publishdate"
-                    { 
-                        write-debug "in switch"; 
-                        $publishdate = $PropertyValue 
-                    }
-                    "weight"
-                    { 
-                        write-debug "in switch"; 
-                        $weight = $PropertyValue 
-                    }
-                    "markup"
-                    { 
-                        write-debug "in switch - markup"; 
-                        $markup = $PropertyValue 
-                    }
-                    "url"
-                    { 
-                        write-debug "in switch"; 
-                        $url = $PropertyValue 
-                    }  
+
                     <#
-                        if the Property name is null, either it's an invalid line
-                        or it's multiline
+                        Retrieve Property Name and Line i.e. key and value
                     #>
-                    ""
-                    {
-                        switch ($PropertyNameFromPreviousLine)
-                        {
-                            "tags"
-                            { 
-                                write-debug "in `$PropertyNameFromPreviousLine switch Tags"; 
-                                $TagString = "$TagString, $PropertyValue"
-                            }
-                    
-                            "categories"
-                            { 
-                                write-debug "in `$PropertyNameFromPreviousLine switch categories `$PropertyValue: <$PropertyValue>"; 
-                                
-                                $StartofValue = $PropertyValue.indexof('-') + 1 
-                                $PropertyValue = $PropertyValue.substring($StartOfValue, $PropertyValue.length - $StartOfValue)
-                                $CategoriesString = "$CategoriesString~$PropertyValue"
-                                write-debug "in `$PropertyNameFromPreviousLine switch: `$CategoriesString: <$CategoriesString>"; 
-                            }
-                    
-                            "aliases"
-                            { 
-                                write-debug "in `$PropertyNameFromPreviousLine switch Aliases"; 
-                                $aliasesString = "$AliasesString, $PropertyValue"
-                            }
-                            "default"
-                            {
-                                write-error "ERR010: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
-                                write-error "ERR010: `$PropertyNameFromPreviousLine: <$PropertyNameFromPreviousLine>"
-                            }
-                         } 
-                    }
-
+                    $HugoNameAndValue = get-HugoNameAndFirstLineValue -FrontMatterLine $Line
+                    [string]$PropertyName = $HugoNameAndValue.Propertyname
+                    [string]$PropertyValue = $HugoNameAndValue.PropertyValue
+                    write-debug "`$PropertyName: <$PropertyName>"
+                    write-debug "`$PropertyValue: <$PropertyValue>"
+    
+                    $PropertyCount = $PropertyCount + 1
                 
-                    Default
-                    { 
-                                write-error "ERR020: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
-                    }
+                    
+                    switch ($PropertyName) 
+                    {
+                        "title" 
+                        { 
+                            write-debug "in switch"; 
+                            $title = $PropertyValue 
+                        }
+                        "description"
+                        { 
+                            write-debug "description - in switch"; 
+                            $description = $PropertyValue 
+                        }
+                        "lastmod"
+                        { 
+                            write-debug "in switch"; 
+                            $lastmod = $PropertyValue 
+                        }
+                        "date"
+                        { 
+                            write-debug "in switch"; 
+                            $date = $PropertyValue 
+                        }
+                        "tags" 
+                        {
                             
-
+                            write-debug "in switch"; 
+                            $TagString = $PropertyValue
+                            
+                        }
+                        # aliases CAN be multiple, but I've not coded for this yet
+                        "aliases"
+                        { 
+                            write-debug "in switch"; 
+                            $aliasesString = $PropertyValue 
+                        }
+                        "categories"
+                        { 
+                            write-debug "in switch"; 
+                            $categoriesString = $PropertyValue 
+                        }
+                    
+                        "draft"
+                        { 
+                            write-debug "in switch"; 
+                            $draft = $PropertyValue 
+                        }
+                        "publishdate"
+                        { 
+                            write-debug "in switch"; 
+                            $publishdate = $PropertyValue 
+                        }
+                        "weight"
+                        { 
+                            write-debug "in switch"; 
+                            $weight = $PropertyValue 
+                        }
+                        "markup"
+                        { 
+                            write-debug "in switch - markup"; 
+                            $markup = $PropertyValue 
+                        }
+                        "url"
+                        { 
+                            write-debug "in switch"; 
+                            $url = $PropertyValue 
+                        }  
+                        <#
+                            if the Property name is null, either it's an invalid line
+                            or it's multiline
+                        #>
+                        ""
+                        {
+                            switch ($PropertyNameFromPreviousLine)
+                            {
+                                "tags"
+                                { 
+                                    write-debug "in `$PropertyNameFromPreviousLine switch Tags"; 
+                                    $TagString = "$TagString, $PropertyValue"
+                                }
+                        
+                                "categories"
+                                { 
+                                    write-debug "in `$PropertyNameFromPreviousLine switch categories `$PropertyValue: <$PropertyValue>"; 
+                                    
+                                    $StartofValue = $PropertyValue.indexof('-') + 1 
+                                    $PropertyValue = $PropertyValue.substring($StartOfValue, $PropertyValue.length - $StartOfValue)
+                                    $CategoriesString = "$CategoriesString~$PropertyValue"
+                                    write-debug "in `$PropertyNameFromPreviousLine switch: `$CategoriesString: <$CategoriesString>"; 
+                                }
+                        
+                                "aliases"
+                                { 
+                                    write-debug "in `$PropertyNameFromPreviousLine switch Aliases"; 
+                                    $aliasesString = "$AliasesString, $PropertyValue"
+                                }
+                                "default"
+                                {
+                                    write-error "ERR010: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                                    write-error "ERR010: `$PropertyNameFromPreviousLine: <$PropertyNameFromPreviousLine>"
+                                }
+                             } 
+                        }
+    
+                    
+                        Default
+                        { 
+                                    write-error "ERR020: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                        }
+                                
+    
+                    }
+                    if ($PropertyName)
+                    {
+                        $PropertyNameFromPreviousLine = $PropertyName
+                    }
+    
                 }
-                if ($PropertyName)
+                elseif ($YamlDividingLines -gt 1)
                 {
-                    $PropertyNameFromPreviousLine = $PropertyName
-                }
-
-            }
-            elseif ($YamlDividingLines -gt 1)
-            {
-                <#
-                    The front matter is over, so the rest is body
-                #>
-                write-debug "Adding to body"
-                $Body = @"
-$Body
-$Line
+                    <#
+                        The front matter is over, so the rest is body
+                    #>
+                    write-verbose "Adding to body <$Line>"
+                    $CarriageReturn = [char]13
+                    $Body = @"
+$Body$Line$CarriageReturn
 "@
-
+    
+                }
             }
         }
-
-        $Body = $Body.trim('_')
+        # $Body = $Body.trim('_')
 
         $TagsArray = get-HugoValueArrayFromString -MultipleValueString $TagString -DElimiter ','
         $AliasesArray = get-HugoValueArrayFromString -MultipleValueString $AliasesString ','
@@ -417,4 +420,242 @@ function get-HugoValueArrayFromString {
   return $Values
 }
 #>
+
+
+function set-HugoContent { 
+<#
+.SYNOPSIS
+    Amends or creates Hugo markdown files
+.DESCRIPTION
+    Todo: get it to work for Json and Toml
+.PARAMETER HugoMarkdownFile
+
+.EXAMPLE
+     
+
+title           : 10th June 1668 - Samuel Pepys visits Salisbury
+description     : 
+lastmod         : 2016-06-07
+date            : 2013-11-29
+tags            : {pepys, literary, old george mall}
+categories      : on-this-day
+aliases         : /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
+draft           : No
+publishdate     : 2013-11-29
+weight          : 610
+markup          : md
+url             : /on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury
+unknownproperty : 
+body            : 
+
+.EXAMPLE
+#>
+    [CmdletBinding()]
+    Param( 
+        [string]$HugoMarkdownFile = "c:\temp\markdown_file.md",
+        [string]$aliases,
+        [string]$body,
+        [string]$categories,
+        [string]$date,
+        [string]$description,
+        [string]$draft,
+        [string]$lastmod,
+        [string]$markup,
+        [string]$publishdate,
+        $tags,
+        [string]$title,
+        [string]$unknownproperty,
+        [string]$url,
+        [string]$weight,
+        [switch]$nobackup
+    )
+
+
+    write-startfunction
+
+    if (test-path $HugoMarkdownFile)
+    {
+        backup-filetooldfolder $HugoMarkdownFile
+    }
+
+    write-debug "`$Tags: <$Tags>"
+    $TagsString = foreach ($Element in $Tags)
+    {
+       write-debug "`$Element: <$Element>"
+       @"
+
+ - "$Element"
+"@ 
+    }
+    
+    $CategoriesString = foreach ($Element in $Categories)
+    {
+       @"
+
+ - "$Element"
+"@ 
+    }
+    
+    $AliasesString = foreach ($Element in $Categories)
+    {
+       @"
+
+ - "$Element"
+"@ 
+    }
+    
+    [string]$HugoString = @"
+---
+title           : $title
+description     : $Description
+lastmod         : $lastmod
+date            : $date
+tags            : $tagsstring
+categories      : $CategoriesString
+aliases         : $AliasesString
+draft           : $Draft
+publishdate     : $PublishDate
+weight          : $Weight
+markup          : $Markup
+url             : $url
+---
+$body
+"@
+
+    $HugoString | set-content $HugoMarkdownFile
+
+    write-endfunction
+}
+
+function backup-FileToOldFolder { 
+<#
+.SYNOPSIS
+Copies the target file to an 'old' directory (creates the old directory if there isn't one) 
+
+.DESCRIPTION
+Function 'backs up' the target file to an 'old' directory. It creates the 'old' directory under the directory of the target file if it doesn't exist. The backup copy is suffixed with the date and time.
+
+.PARAMETER file
+The file you want to back up, with the full filepath
+
+.EXAMPLE
+backup-FileToOldFolder g:\my_scripts\x.txt
+
+#>
+  Param( [String] $file,
+         [String] $OldFolder)
+
+  write-startfunction
+
+  $FsFile="Filesystem::$File"
+
+  if ($OldFolder)
+  {
+    write-debug "`$Oldfolder specified"
+  }
+  else
+  {
+    $OldFolder = $(get-childitem $FsFile).directory
+    $OldFolder = "Filesystem::$OldFolder\old"
+  }
+  write-debug "Old folder is $OldFolder"
+
+  # If 'old' folder doesn't exist, create it
+  $OldFolderExists = test-path $OldFolder
+  if ($OldFolderExists -eq $FALSE) 
+  {
+    mkdir $OldFolder
+  }
+
+  # get the date in YYYYMMDD format
+  $DateSuffix = get-date -uformat "%Y%m%d%H%M"
+
+  # get the filename without the folder
+  $FileName = $(get-childitem $File).name
+  write-debug "FileName is $FileName"
+
+  # copy the existing file to the 'old' directory
+  $OldFile = $OldFolder + "\" + $FileName + "_" + $DateSuffix
+  write-debug "OldFile is $OldFile"
+  copy $File $OldFile
+
+}
+
+
+
+
+function new-HugoParentPage { 
+<#
+.SYNOPSIS
+    One-line description
+.DESCRIPTION
+    Longer description
+.PARAMETER
+
+.EXAMPLE
+    Example of how to use this cmdlet
+
+.EXAMPLE
+    Another example of how to use this cmdlet
+#>
+    [CmdletBinding()]
+    Param( [string]$NewParentPage,
+           [string]$FileSpec,
+           [String]$HeaderText,
+           [String]$FooterText)
+            
+
+    write-startfunction
+
+    $HugoPages = foreach ($file in $(dir $FileSpec | where extension -eq '.md')) 
+    { 
+        $H = get-HugoContent $file 
+        [PSCustomObject]@{ url = $H.url
+                           title = $H.title
+                           weight = $H.weight
+                         }
+    }
+
+    foreach ($H in $HugoPages | sort-object -property weight)
+    {
+        [string]$url = $h.url
+        [string]$Title = $h.title
+        [string]$Weight = $h.Weight
+        $HyperLink = "<a href=`"$url`">$title</a>"
+        write-debug "`$Hyperlink: <$Hyperlink>"
+        $BodyText = @"
+$BodyText
+$HyperLink
+"@
+    }
+
+    $PageText = @"
+$HeaderText
+
+$BodyText
+
+$FooterText
+"@
+
+   if ($NewParentPage)
+   {
+        # todo: backup page
+        # todo: write this!
+        write-host "todo"
+
+   }
+
+   return $PageText
+
+   write-endfunction
+
+}
+
+set-alias temp get-template
+
+<#
+vim: tabstop=4 softtabstop=4 shiftwidth=4 expandtab
+#>
+
+
 
